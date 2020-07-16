@@ -45,7 +45,6 @@ namespace bpl {
 /* 14 */ ERROR_CODE(BH_SLAVE_SOCKET_DISCONNECTED)                                           \
 /* 15 */ ERROR_CODE(BH_STOPPED)                                                             \
 /* 16 */ ERROR_CODE(SLAVE_CONNECTING_TO_BACKHAUL_MANAGER)                                   \
-/* 17 */ ERROR_CODE(SLAVE_MASTER_KEEP_ALIVE_TIMEOUT)                                        \
 /* 18 */ ERROR_CODE(SLAVE_INVALID_MASTER_SOCKET)                                            \
 /* 19 */ ERROR_CODE(SLAVE_FAILED_CONNECT_TO_PLATFORM_MANAGER)                               \
 /* 20 */ ERROR_CODE(SLAVE_PLATFORM_MANAGER_REGISTER_TIMEOUT)                                \
