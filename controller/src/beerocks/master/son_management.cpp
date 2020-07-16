@@ -26,6 +26,8 @@
 
 #include <easylogging++.h>
 
+#include <bpl/bpl_db.h>
+
 using namespace beerocks;
 using namespace net;
 using namespace son;
@@ -2346,6 +2348,24 @@ void son_management::handle_bml_message(Socket *sd,
         if (!request) {
             LOG(ERROR) << "addClass cACTION_BML_CLIENT_SET_CLIENT_REQUEST failed";
             break;
+        }
+
+        std::unordered_map<std::string, std::string> params_in;
+        std::unordered_map<std::string, std::string> params_out;
+
+        auto client_addr = tlvf::mac_to_string(request->sta_mac());
+        std::transform(client_addr.begin(), client_addr.end(), client_addr.begin(),
+                       [](unsigned char c) -> unsigned char { return c == ':' ? '_' : c; });
+        auto &config                         = request->client_config();
+        params_in["stay_on_initial_radio"]   = config.stay_on_initial_radio;
+        params_in["stay_on_selected_device"] = config.stay_on_selected_device;
+        params_in["selected_bands"]          = config.selected_bands;
+
+        bool set_op  = bpl::db_set_entry("client", client_addr, params_in);
+        bool get_all = bpl::db_get_entry("client", client_addr, params_out);
+        LOG(TRACE) << "Set: " << set_op << " Get: " << get_all;
+        for (auto option : params_out) {
+            LOG(TRACE) << option.first << "=" << option.second;
         }
 
         auto response = message_com::create_vs_message<
