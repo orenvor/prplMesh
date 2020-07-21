@@ -2361,11 +2361,16 @@ void son_management::handle_bml_message(Socket *sd,
         params_in["stay_on_selected_device"] = config.stay_on_selected_device;
         params_in["selected_bands"]          = config.selected_bands;
 
-        bool set_op  = bpl::db_set_entry("client", client_addr, params_in);
-        bool get_all = bpl::db_get_entry("client", client_addr, params_out);
-        LOG(TRACE) << "Set: " << set_op << " Get: " << get_all;
-        for (auto option : params_out) {
-            LOG(TRACE) << option.first << "=" << option.second;
+        if (bpl::db_set_entry("client", client_addr, params_in)) {
+            if (bpl::db_get_entry("client", client_addr, params_out)) {
+                for (auto option : params_out) {
+                    LOG(TRACE) << option.first << "=" << option.second;
+                }
+            } else {
+                LOG(TRACE) << "Failed to get";
+            }
+        } else {
+            LOG(TRACE) << "Failed to set";
         }
 
         auto response = message_com::create_vs_message<

@@ -152,8 +152,10 @@ bool uci_set_entry(const std::string &config_file, const std::string &entry_type
             return false;
         }
 
+        LOG(TRACE) << "Found " << opt_path;
         //Set the actual value
         opt_ptr.value = strdup(param.second.c_str());
+        LOG(TRACE) << "Setting " << opt_path << "=" << param.second;
 
         // If option does not exist, 'uci_set' creates it.
         if (uci_set(ctx, &opt_ptr) != UCI_OK) {
@@ -169,6 +171,7 @@ bool uci_set_entry(const std::string &config_file, const std::string &entry_type
             // }
         }
     }
+    LOG(TRACE) << "Finished setting parameters. about to commit changes";
 
     // Commit changes to file
     if (uci_commit(ctx, &pkg_ptr.p, false) != UCI_OK) {
