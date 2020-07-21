@@ -40,7 +40,6 @@ public:
         uint16_t ucc_listener_port;
         std::string bridge_iface;
         int stop_on_failure_attempts;
-        bool enable_keep_alive;
         bool enable_repeater_mode;
         std::string backhaul_wire_iface;
         beerocks::eIfaceType backhaul_wire_iface_type;
