@@ -107,6 +107,12 @@ private:
     int nw_map_query_caller(int numOfArgs);
     int bml_connection_map_caller(int numOfArgs);
     int bml_get_device_operational_radios_caller(int numOfArgs);
+
+    //================================================
+    //BML API caller function
+    int bml_oren_print_caller(int numOfArgs);
+    //================================================
+
     int stat_register_cb_caller(int numOfArgs);
     int events_register_cb_caller(int numOfArgs);
     int set_wifi_credentials_caller(int numOfArgs);
@@ -160,6 +166,12 @@ private:
     int nw_map_query();
     int connection_map();
     int get_device_operational_radios(const std::string &al_mac);
+
+    //================================================
+    //New function to handle the new BML message
+    int oren_print(const std::string &str);
+    //================================================
+
     int stat_register_cb(const std::string &optional = std::string());
     int events_register_cb(const std::string &optional = std::string());
     int set_wifi_credentials(const std::string &al_mac, const std::string &ssid,
