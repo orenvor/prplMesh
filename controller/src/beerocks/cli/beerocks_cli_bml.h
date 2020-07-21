@@ -111,6 +111,7 @@ private:
     //================================================
     //BML API caller function
     int bml_oren_print_caller(int numOfArgs);
+    int bml_oren_reverse_string_caller(int numOfArgs);
     //================================================
 
     int stat_register_cb_caller(int numOfArgs);
@@ -170,6 +171,7 @@ private:
     //================================================
     //New function to handle the new BML message
     int oren_print(const std::string &str);
+    int oren_reverse_string(const std::string &str);
     //================================================
 
     int stat_register_cb(const std::string &optional = std::string());

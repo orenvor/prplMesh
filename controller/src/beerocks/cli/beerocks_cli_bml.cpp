@@ -385,6 +385,10 @@ void cli_bml::setFunctionsMapAndArray()
     insertCommandToMap("bml_oren_print", "", "print a string back to stdout",
                        static_cast<pFunction>(&cli_bml::bml_oren_print_caller), 0, 1, STRING_ARG);
 
+    //Registration of the new BML message API - caller function have one argument of type string
+    insertCommandToMap(
+        "bml_oren_reverse_string", "", "print the string in reverse char order (last to first)",
+        static_cast<pFunction>(&cli_bml::bml_oren_reverse_string_caller), 0, 1, STRING_ARG);
     //================================================
 
     insertCommandToMap("bml_stat_register_cb", "[<x>]",
@@ -950,6 +954,15 @@ int cli_bml::bml_oren_print_caller(int numOfArgs)
     return oren_print(args.stringArgs[0]);
 }
 
+int cli_bml::bml_oren_reverse_string_caller(int numOfArgs)
+{
+    LOG(TRACE) << "=========> cli_bml::bml_oren_reverse_string_caller()" << std::endl;
+
+    if (numOfArgs != 1) {
+        return -1;
+    }
+    return oren_reverse_string(args.stringArgs[0]);
+}
 //================================================
 
 int cli_bml::stat_register_cb_caller(int numOfArgs)
@@ -1502,6 +1515,26 @@ int cli_bml::oren_print(const std::string &str)
     return BML_RET_OK;
 }
 
+//Function the call the new BML handler warpper (in bml.cpp)
+int cli_bml::oren_reverse_string(const std::string &str)
+{
+    LOG(TRACE) << "=========> cli_bml::oren_reverse_string(): " << str << std::endl;
+
+    auto str_in  = str.c_str();
+    auto str_out = (char *)malloc(sizeof(char) * str.length());
+
+    int ret = bml_oren_reverse_string(ctx, str_in, str_out);
+
+    if (ret != BML_RET_OK) {
+        std::cout << "FAIL oren_reverse_string()" << std::endl;
+    } else {
+        std::cout << str_out << std::endl;
+    }
+
+    free(str_out);
+    printBmlReturnVals("oren_reverse_string", ret);
+    return 0;
+}
 //================================================
 
 int cli_bml::stat_register_cb(const std::string &optional)

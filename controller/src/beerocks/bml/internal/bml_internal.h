@@ -273,6 +273,16 @@ public:
      */
     int client_get_client_list(std::string &client_list, unsigned int *client_list_size);
 
+    //================================================
+    /*
+     * Reverses the the string order from back to front.
+     *
+     * @param [in] string for reversing.
+     * @param [out] str_out the reversed string.
+     */
+    int oren_reverse_string(const char *str_in, std::string &str_out);
+    //================================================
+
     /**
      * Set client configuration.
      *
@@ -363,6 +373,9 @@ private:
     //Promise used to indicate the GetResults response was received
     beerocks::promise<int> *m_prmChannelScanResultsGet = nullptr;
     beerocks::promise<bool> *m_prmClientListGet        = nullptr;
+    //================================================
+    beerocks::promise<bool> *m_prmOrenReverseString    = nullptr;
+    //================================================
     beerocks::promise<bool> *m_prmClientGet            = nullptr;
 
     std::map<uint8_t, beerocks::promise<int> *> m_prmCliResponses;
@@ -385,6 +398,10 @@ private:
     std::list<beerocks_message::sChannelScanResults> *m_scan_results = nullptr;
     //m_scan_results_status is used to store the results' latest status
     uint8_t *m_scan_results_status = nullptr;
+    //================================================
+    //m_OrenReverseString_out is used when receiving oren string reverse response
+    std::string *m_orenReverseStringOut = nullptr;
+    //================================================
     //m_scan_results_maxsize is used to indicate the maximum capacity of the requested results
     uint32_t *m_scan_results_maxsize = nullptr;
     std::string *m_client_list       = nullptr;

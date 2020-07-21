@@ -6117,6 +6117,262 @@ bool cACTION_BML_UNREGISTER_TOPOLOGY_QUERY::init()
     return true;
 }
 
+cACTION_BML_OREN_REVERSE_STR_REQUEST::cACTION_BML_OREN_REVERSE_STR_REQUEST(uint8_t* buff, size_t buff_len, bool parse) :
+    BaseClass(buff, buff_len, parse) {
+    m_init_succeeded = init();
+}
+cACTION_BML_OREN_REVERSE_STR_REQUEST::cACTION_BML_OREN_REVERSE_STR_REQUEST(std::shared_ptr<BaseClass> base, bool parse) :
+BaseClass(base->getBuffPtr(), base->getBuffRemainingBytes(), parse){
+    m_init_succeeded = init();
+}
+cACTION_BML_OREN_REVERSE_STR_REQUEST::~cACTION_BML_OREN_REVERSE_STR_REQUEST() {
+}
+uint32_t& cACTION_BML_OREN_REVERSE_STR_REQUEST::buffer_size() {
+    return (uint32_t&)(*m_buffer_size);
+}
+
+std::string cACTION_BML_OREN_REVERSE_STR_REQUEST::buffer_str() {
+    char *buffer_ = buffer();
+    if (!buffer_) { return std::string(); }
+    return std::string(buffer_, m_buffer_idx__);
+}
+
+char* cACTION_BML_OREN_REVERSE_STR_REQUEST::buffer(size_t length) {
+    if( (m_buffer_idx__ == 0) || (m_buffer_idx__ < length) ) {
+        TLVF_LOG(ERROR) << "buffer length is smaller than requested length";
+        return nullptr;
+    }
+    return ((char*)m_buffer);
+}
+
+bool cACTION_BML_OREN_REVERSE_STR_REQUEST::set_buffer(const std::string& str) { return set_buffer(str.c_str(), str.size()); }
+bool cACTION_BML_OREN_REVERSE_STR_REQUEST::set_buffer(const char str[], size_t size) {
+    if (str == nullptr) {
+        TLVF_LOG(WARNING) << "set_buffer received a null pointer.";
+        return false;
+    }
+    if (!alloc_buffer(size)) { return false; }
+    std::copy(str, str + size, m_buffer);
+    return true;
+}
+bool cACTION_BML_OREN_REVERSE_STR_REQUEST::alloc_buffer(size_t count) {
+    if (m_lock_order_counter__ > 0) {;
+        TLVF_LOG(ERROR) << "Out of order allocation for variable length list buffer, abort!";
+        return false;
+    }
+    size_t len = sizeof(char) * count;
+    if(getBuffRemainingBytes() < len )  {
+        TLVF_LOG(ERROR) << "Not enough available space on buffer - can't allocate";
+        return false;
+    }
+    m_lock_order_counter__ = 0;
+    uint8_t *src = (uint8_t *)&m_buffer[*m_buffer_size];
+    uint8_t *dst = src + len;
+    if (!m_parse__) {
+        size_t move_length = getBuffRemainingBytes(src) - len;
+        std::copy_n(src, move_length, dst);
+    }
+    m_buffer_idx__ += count;
+    *m_buffer_size += count;
+    if (!buffPtrIncrementSafe(len)) {
+        LOG(ERROR) << "buffPtrIncrementSafe(" << std::dec << len << ") Failed!";
+        return false;
+    }
+    return true;
+}
+
+void cACTION_BML_OREN_REVERSE_STR_REQUEST::class_swap()
+{
+    tlvf_swap(8*sizeof(eActionOp_BML), reinterpret_cast<uint8_t*>(m_action_op));
+    tlvf_swap(32, reinterpret_cast<uint8_t*>(m_buffer_size));
+}
+
+bool cACTION_BML_OREN_REVERSE_STR_REQUEST::finalize()
+{
+    if (m_parse__) {
+        TLVF_LOG(DEBUG) << "finalize() called but m_parse__ is set";
+        return true;
+    }
+    if (m_finalized__) {
+        TLVF_LOG(DEBUG) << "finalize() called for already finalized class";
+        return true;
+    }
+    if (!isPostInitSucceeded()) {
+        TLVF_LOG(ERROR) << "post init check failed";
+        return false;
+    }
+    if (m_inner__) {
+        if (!m_inner__->finalize()) {
+            TLVF_LOG(ERROR) << "m_inner__->finalize() failed";
+            return false;
+        }
+        auto tailroom = m_inner__->getMessageBuffLength() - m_inner__->getMessageLength();
+        m_buff_ptr__ -= tailroom;
+    }
+    class_swap();
+    m_finalized__ = true;
+    return true;
+}
+
+size_t cACTION_BML_OREN_REVERSE_STR_REQUEST::get_initial_size()
+{
+    size_t class_size = 0;
+    class_size += sizeof(uint32_t); // buffer_size
+    return class_size;
+}
+
+bool cACTION_BML_OREN_REVERSE_STR_REQUEST::init()
+{
+    if (getBuffRemainingBytes() < get_initial_size()) {
+        TLVF_LOG(ERROR) << "Not enough available space on buffer. Class init failed";
+        return false;
+    }
+    m_buffer_size = reinterpret_cast<uint32_t*>(m_buff_ptr__);
+    if (!m_parse__) *m_buffer_size = 0;
+    if (!buffPtrIncrementSafe(sizeof(uint32_t))) {
+        LOG(ERROR) << "buffPtrIncrementSafe(" << std::dec << sizeof(uint32_t) << ") Failed!";
+        return false;
+    }
+    m_buffer = (char*)m_buff_ptr__;
+    uint32_t buffer_size = *m_buffer_size;
+    if (m_parse__) {  tlvf_swap(32, reinterpret_cast<uint8_t*>(&buffer_size)); }
+    m_buffer_idx__ = buffer_size;
+    if (!buffPtrIncrementSafe(sizeof(char) * (buffer_size))) {
+        LOG(ERROR) << "buffPtrIncrementSafe(" << std::dec << sizeof(char) * (buffer_size) << ") Failed!";
+        return false;
+    }
+    if (m_parse__) { class_swap(); }
+    return true;
+}
+
+cACTION_BML_OREN_REVERSE_STR_RESPONSE::cACTION_BML_OREN_REVERSE_STR_RESPONSE(uint8_t* buff, size_t buff_len, bool parse) :
+    BaseClass(buff, buff_len, parse) {
+    m_init_succeeded = init();
+}
+cACTION_BML_OREN_REVERSE_STR_RESPONSE::cACTION_BML_OREN_REVERSE_STR_RESPONSE(std::shared_ptr<BaseClass> base, bool parse) :
+BaseClass(base->getBuffPtr(), base->getBuffRemainingBytes(), parse){
+    m_init_succeeded = init();
+}
+cACTION_BML_OREN_REVERSE_STR_RESPONSE::~cACTION_BML_OREN_REVERSE_STR_RESPONSE() {
+}
+uint32_t& cACTION_BML_OREN_REVERSE_STR_RESPONSE::buffer_size() {
+    return (uint32_t&)(*m_buffer_size);
+}
+
+std::string cACTION_BML_OREN_REVERSE_STR_RESPONSE::buffer_str() {
+    char *buffer_ = buffer();
+    if (!buffer_) { return std::string(); }
+    return std::string(buffer_, m_buffer_idx__);
+}
+
+char* cACTION_BML_OREN_REVERSE_STR_RESPONSE::buffer(size_t length) {
+    if( (m_buffer_idx__ == 0) || (m_buffer_idx__ < length) ) {
+        TLVF_LOG(ERROR) << "buffer length is smaller than requested length";
+        return nullptr;
+    }
+    return ((char*)m_buffer);
+}
+
+bool cACTION_BML_OREN_REVERSE_STR_RESPONSE::set_buffer(const std::string& str) { return set_buffer(str.c_str(), str.size()); }
+bool cACTION_BML_OREN_REVERSE_STR_RESPONSE::set_buffer(const char str[], size_t size) {
+    if (str == nullptr) {
+        TLVF_LOG(WARNING) << "set_buffer received a null pointer.";
+        return false;
+    }
+    if (!alloc_buffer(size)) { return false; }
+    std::copy(str, str + size, m_buffer);
+    return true;
+}
+bool cACTION_BML_OREN_REVERSE_STR_RESPONSE::alloc_buffer(size_t count) {
+    if (m_lock_order_counter__ > 0) {;
+        TLVF_LOG(ERROR) << "Out of order allocation for variable length list buffer, abort!";
+        return false;
+    }
+    size_t len = sizeof(char) * count;
+    if(getBuffRemainingBytes() < len )  {
+        TLVF_LOG(ERROR) << "Not enough available space on buffer - can't allocate";
+        return false;
+    }
+    m_lock_order_counter__ = 0;
+    uint8_t *src = (uint8_t *)&m_buffer[*m_buffer_size];
+    uint8_t *dst = src + len;
+    if (!m_parse__) {
+        size_t move_length = getBuffRemainingBytes(src) - len;
+        std::copy_n(src, move_length, dst);
+    }
+    m_buffer_idx__ += count;
+    *m_buffer_size += count;
+    if (!buffPtrIncrementSafe(len)) {
+        LOG(ERROR) << "buffPtrIncrementSafe(" << std::dec << len << ") Failed!";
+        return false;
+    }
+    return true;
+}
+
+void cACTION_BML_OREN_REVERSE_STR_RESPONSE::class_swap()
+{
+    tlvf_swap(8*sizeof(eActionOp_BML), reinterpret_cast<uint8_t*>(m_action_op));
+    tlvf_swap(32, reinterpret_cast<uint8_t*>(m_buffer_size));
+}
+
+bool cACTION_BML_OREN_REVERSE_STR_RESPONSE::finalize()
+{
+    if (m_parse__) {
+        TLVF_LOG(DEBUG) << "finalize() called but m_parse__ is set";
+        return true;
+    }
+    if (m_finalized__) {
+        TLVF_LOG(DEBUG) << "finalize() called for already finalized class";
+        return true;
+    }
+    if (!isPostInitSucceeded()) {
+        TLVF_LOG(ERROR) << "post init check failed";
+        return false;
+    }
+    if (m_inner__) {
+        if (!m_inner__->finalize()) {
+            TLVF_LOG(ERROR) << "m_inner__->finalize() failed";
+            return false;
+        }
+        auto tailroom = m_inner__->getMessageBuffLength() - m_inner__->getMessageLength();
+        m_buff_ptr__ -= tailroom;
+    }
+    class_swap();
+    m_finalized__ = true;
+    return true;
+}
+
+size_t cACTION_BML_OREN_REVERSE_STR_RESPONSE::get_initial_size()
+{
+    size_t class_size = 0;
+    class_size += sizeof(uint32_t); // buffer_size
+    return class_size;
+}
+
+bool cACTION_BML_OREN_REVERSE_STR_RESPONSE::init()
+{
+    if (getBuffRemainingBytes() < get_initial_size()) {
+        TLVF_LOG(ERROR) << "Not enough available space on buffer. Class init failed";
+        return false;
+    }
+    m_buffer_size = reinterpret_cast<uint32_t*>(m_buff_ptr__);
+    if (!m_parse__) *m_buffer_size = 0;
+    if (!buffPtrIncrementSafe(sizeof(uint32_t))) {
+        LOG(ERROR) << "buffPtrIncrementSafe(" << std::dec << sizeof(uint32_t) << ") Failed!";
+        return false;
+    }
+    m_buffer = (char*)m_buff_ptr__;
+    uint32_t buffer_size = *m_buffer_size;
+    if (m_parse__) {  tlvf_swap(32, reinterpret_cast<uint8_t*>(&buffer_size)); }
+    m_buffer_idx__ = buffer_size;
+    if (!buffPtrIncrementSafe(sizeof(char) * (buffer_size))) {
+        LOG(ERROR) << "buffPtrIncrementSafe(" << std::dec << sizeof(char) * (buffer_size) << ") Failed!";
+        return false;
+    }
+    if (m_parse__) { class_swap(); }
+    return true;
+}
+
 cACTION_BML_TRIGGER_CHANNEL_SELECTION_REQUEST::cACTION_BML_TRIGGER_CHANNEL_SELECTION_REQUEST(uint8_t* buff, size_t buff_len, bool parse) :
     BaseClass(buff, buff_len, parse) {
     m_init_succeeded = init();

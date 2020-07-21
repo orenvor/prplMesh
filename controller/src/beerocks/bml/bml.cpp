@@ -754,3 +754,22 @@ int bml_client_get_client(BML_CTX ctx, const char *sta_mac, struct BML_CLIENT *c
     auto pBML = static_cast<bml_internal *>(ctx);
     return pBML->client_get_client(tlvf::mac_from_string(std::string(sta_mac)), client);
 }
+
+//================================================
+int bml_oren_reverse_string(BML_CTX ctx, const char *str_in, char *str_out)
+{
+    LOG(TRACE) << "=========> cli_bml::bml_oren_reverse_string(): " << str_in << std::endl;
+
+    if (!ctx || !str_in || !str_out) {
+        return (-BML_RET_INVALID_ARGS);
+    }
+    bml_internal *pBML = (bml_internal *)ctx;
+    std::string tmp_str_out;
+
+    int ret = (pBML->oren_reverse_string(str_in, tmp_str_out));
+    if (ret == BML_RET_OK) {
+        beerocks::string_utils::copy_string(str_out, tmp_str_out.c_str(), tmp_str_out.length() + 1);
+    }
+    return ret;
+}
+//================================================
