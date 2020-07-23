@@ -1154,6 +1154,34 @@ int bml_internal::process_cmdu_header(std::shared_ptr<beerocks_header> beerocks_
                              << "but no one is waiting...";
             }
         } break;
+
+        //================================================
+        case beerocks_message::ACTION_BML_OREN_REVERSE_STR_RESPONSE: {
+            LOG(DEBUG) << "ACTION_BML_OREN_REVERSE_STR_RESPONSE received";
+
+            auto response =
+                beerocks_header
+                    ->addClass<beerocks_message::cACTION_BML_OREN_REVERSE_STR_RESPONSE>();
+            if (!response) {
+                LOG(ERROR) << "addClass cACTION_BML_OREN_REVERSE_STR_RESPONSE failed";
+                return BML_RET_OP_FAILED;
+            }
+
+            //Signal any waiting threads
+            if (m_prmOrenReverseString) {
+                //mark response as success
+                m_prmOrenReverseString->set_value(true);
+                *m_orenReverseStringOut = response->buffer();
+                LOG(DEBUG) << "===> response = " << response->buffer();
+
+            } else {
+                LOG(WARNING) << "Received cACTION_BML_OREN_REVERSE_STR_RESPONSE response, "
+                             << "but no one is waiting...";
+                *m_orenReverseStringOut = std::string();
+            }
+        } break;
+            //================================================
+
         case beerocks_message::ACTION_BML_CLIENT_SET_CLIENT_RESPONSE: {
             LOG(DEBUG) << "ACTION_BML_CLIENT_SET_CLIENT_RESPONSE received";
             auto response =
@@ -1902,6 +1930,73 @@ int bml_internal::client_get_client_list(std::string &client_list, unsigned int 
 
     return BML_RET_OK;
 }
+
+//================================================
+int bml_internal::oren_reverse_string(const char *str_in, std::string &str_out)
+{
+    LOG(TRACE) << "=========> bml_internal::oren_reverse_string()" << std::endl;
+
+    if (!str_in) {
+        LOG(ERROR) << "str_in must be initialized";
+        return (-BML_RET_INVALID_DATA);
+    }
+
+    // If the socket is not valid, attempt to re-establish the connection
+    if (!m_sockMaster) {
+        int iRet = connect_to_master();
+        if (iRet != BML_RET_OK) {
+            LOG(ERROR) << " Unable to create context, connect_to_master failed!";
+            return iRet;
+        }
+    }
+
+    // Initialize the promise for receiving the response
+    beerocks::promise<bool> prmOrenReverseString;
+    m_prmOrenReverseString = &prmOrenReverseString;
+    int iOpTimeout         = RESPONSE_TIMEOUT; // Default timeout
+    m_orenReverseStringOut = &str_out;
+
+    auto request =
+        message_com::create_vs_message<beerocks_message::cACTION_BML_OREN_REVERSE_STR_REQUEST>(
+            cmdu_tx);
+
+    if (!request) {
+        LOG(ERROR) << "Failed building cACTION_BML_OREN_REVERSE_STR_REQUEST message!";
+        return (-BML_RET_OP_FAILED);
+    }
+
+    // Set parameters inside the message
+    request->set_buffer(str_in);
+
+    // Build and send the message
+    if (!message_com::send_cmdu(m_sockMaster, cmdu_tx)) {
+        LOG(ERROR) << "Failed sending param get message!";
+        m_prmOrenReverseString  = nullptr;
+        *m_orenReverseStringOut = std::string();
+        return (-BML_RET_OP_FAILED);
+    }
+    LOG(DEBUG) << "cACTION_BML_OREN_REVERSE_STR_REQUEST sent";
+
+    int iRet = BML_RET_OK;
+
+    if (!m_prmOrenReverseString->wait_for(iOpTimeout)) {
+        LOG(WARNING) << "Timeout while waiting for oren reverse string to response...";
+        iRet                    = -BML_RET_TIMEOUT;
+        *m_orenReverseStringOut = std::string();
+    }
+
+    // Clear the oren reverse string members
+    m_orenReverseStringOut = nullptr;
+
+    // Clear the promise holder
+    m_prmOrenReverseString = nullptr;
+
+    LOG_IF(iRet != BML_RET_OK, ERROR)
+        << "Oren reverse string request returned with error code:" << iRet;
+
+    return BML_RET_OK;
+}
+//================================================
 
 int bml_internal::client_set_client(const sMacAddr &sta_mac, const BML_CLIENT_CONFIG &client_config)
 {

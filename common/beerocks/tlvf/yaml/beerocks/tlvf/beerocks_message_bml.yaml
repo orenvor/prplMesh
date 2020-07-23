@@ -393,6 +393,28 @@ cACTION_BML_REGISTER_TOPOLOGY_QUERY:
 cACTION_BML_UNREGISTER_TOPOLOGY_QUERY:
   _type: class
 
+#================================================
+cACTION_BML_OREN_REVERSE_STR_REQUEST:
+  _type: class
+  buffer_size:
+    _type: uint32_t
+    _length_var: True
+  buffer:
+    _type: char
+    _length: [buffer_size]
+#================================================
+
+#================================================
+cACTION_BML_OREN_REVERSE_STR_RESPONSE:
+  _type: class
+  buffer_size:
+    _type: uint32_t
+    _length_var: True
+  buffer:
+    _type: char
+    _length: [buffer_size]
+#================================================
+
 cACTION_BML_TRIGGER_CHANNEL_SELECTION_REQUEST:
   _type: class
   al_mac: sMacAddr

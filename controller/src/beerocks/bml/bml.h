@@ -679,6 +679,18 @@ int bml_client_set_client(BML_CTX ctx, const char *sta_mac,
  */
 int bml_client_get_client(BML_CTX ctx, const char *sta_mac, struct BML_CLIENT *client);
 
+//================================================
+/**
+ * Reverses the the string order from back to front.
+ *
+ * @param [in] ctx BML Context.
+ * @param [in] string for reversing.
+ * @param [out] str_out the reversed string.
+ * @return BML_RET_OK on success.
+ */
+int bml_oren_reverse_string(BML_CTX ctx, const char *str_in, char *str_out);
+//================================================
+
 #ifdef __cplusplus
 } /* extern "C" */
 #endif

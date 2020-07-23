@@ -814,6 +814,17 @@ void son_management::handle_cli_message(Socket *sd,
         message_com::send_cmdu(sd, cmdu_tx);
         break;
     }
+<<<<<<< HEAD
+=======
+
+    //=======================
+    case beerocks_message::ACTION_CLI_OREN_PRINT: {
+        LOG(TRACE) << "========> controller received  beerocks_message::ACTION_CLI_OREN_PRINT";
+        break;
+    }
+        //=======================
+
+>>>>>>> 9f4ace55... tlvf: Add new bml request-response message
     case beerocks_message::ACTION_CLI_OPTIMAL_PATH_TASK: {
         auto request = beerocks_header->addClass<beerocks_message::cACTION_CLI_OPTIMAL_PATH_TASK>();
         if (request == nullptr) {
@@ -1119,6 +1130,40 @@ void son_management::handle_bml_message(Socket *sd,
 
         message_com::send_cmdu(sd, cmdu_tx);
     } break;
+
+    //================================================
+    case beerocks_message::ACTION_BML_OREN_REVERSE_STR_REQUEST: {
+        //build request
+        auto request =
+            beerocks_header->addClass<beerocks_message::cACTION_BML_OREN_REVERSE_STR_REQUEST>();
+        if (request == nullptr) {
+            LOG(ERROR) << "addClass cACTION_BML_OREN_REVERSE_STR_REQUEST failed";
+            break;
+        }
+
+        LOG(INFO) << "BML ACTION_BML_OREN_REVERSE_STR_REQUEST received";
+        LOG(INFO) << "str_in = " << request->buffer();
+
+        //build response
+        auto response =
+            message_com::create_vs_message<beerocks_message::cACTION_BML_OREN_REVERSE_STR_RESPONSE>(
+                cmdu_tx);
+
+        if (response == nullptr) {
+            LOG(ERROR) << "Failed building ACTION_BML_OREN_REVERSE_STR_RESPONSE message!";
+            break;
+        }
+
+        //Reverse the string in request
+        std::string str_in(request->buffer());
+        std::reverse(str_in.begin(), str_in.end());
+
+        response->set_buffer(str_in);
+
+        LOG(INFO) << "===>beerocks_message::ACTION_BML_OREN_REVERSE_STR_REQUEST - send_cmdu";
+        message_com::send_cmdu(sd, cmdu_tx);
+    } break;
+        //================================================
 
     case beerocks_message::ACTION_BML_GET_CLIENT_ROAMING_REQUEST: {
         auto response = message_com::create_vs_message<

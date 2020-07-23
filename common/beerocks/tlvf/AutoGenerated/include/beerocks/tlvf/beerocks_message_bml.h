@@ -1798,6 +1798,64 @@ class cACTION_BML_UNREGISTER_TOPOLOGY_QUERY : public BaseClass
         eActionOp_BML* m_action_op = nullptr;
 };
 
+class cACTION_BML_OREN_REVERSE_STR_REQUEST : public BaseClass
+{
+    public:
+        cACTION_BML_OREN_REVERSE_STR_REQUEST(uint8_t* buff, size_t buff_len, bool parse = false);
+        explicit cACTION_BML_OREN_REVERSE_STR_REQUEST(std::shared_ptr<BaseClass> base, bool parse = false);
+        ~cACTION_BML_OREN_REVERSE_STR_REQUEST();
+
+        static eActionOp_BML get_action_op(){
+            return (eActionOp_BML)(ACTION_BML_OREN_REVERSE_STR_REQUEST);
+        }
+        uint32_t& buffer_size();
+        std::string buffer_str();
+        char* buffer(size_t length = 0);
+        bool set_buffer(const std::string& str);
+        bool set_buffer(const char buffer[], size_t size);
+        bool alloc_buffer(size_t count = 1);
+        void class_swap() override;
+        bool finalize() override;
+        static size_t get_initial_size();
+
+    private:
+        bool init();
+        eActionOp_BML* m_action_op = nullptr;
+        uint32_t* m_buffer_size = nullptr;
+        char* m_buffer = nullptr;
+        size_t m_buffer_idx__ = 0;
+        int m_lock_order_counter__ = 0;
+};
+
+class cACTION_BML_OREN_REVERSE_STR_RESPONSE : public BaseClass
+{
+    public:
+        cACTION_BML_OREN_REVERSE_STR_RESPONSE(uint8_t* buff, size_t buff_len, bool parse = false);
+        explicit cACTION_BML_OREN_REVERSE_STR_RESPONSE(std::shared_ptr<BaseClass> base, bool parse = false);
+        ~cACTION_BML_OREN_REVERSE_STR_RESPONSE();
+
+        static eActionOp_BML get_action_op(){
+            return (eActionOp_BML)(ACTION_BML_OREN_REVERSE_STR_RESPONSE);
+        }
+        uint32_t& buffer_size();
+        std::string buffer_str();
+        char* buffer(size_t length = 0);
+        bool set_buffer(const std::string& str);
+        bool set_buffer(const char buffer[], size_t size);
+        bool alloc_buffer(size_t count = 1);
+        void class_swap() override;
+        bool finalize() override;
+        static size_t get_initial_size();
+
+    private:
+        bool init();
+        eActionOp_BML* m_action_op = nullptr;
+        uint32_t* m_buffer_size = nullptr;
+        char* m_buffer = nullptr;
+        size_t m_buffer_idx__ = 0;
+        int m_lock_order_counter__ = 0;
+};
+
 class cACTION_BML_TRIGGER_CHANNEL_SELECTION_REQUEST : public BaseClass
 {
     public:
